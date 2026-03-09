@@ -14,6 +14,6 @@ public class Matiere {
 
     private String nom;
 
-    @Column(columnDefinition = "NUMERIC DEFAULT 1")
+    @Column(precision = 10, scale = 2)
     private BigDecimal coefficient = BigDecimal.ONE;
 }

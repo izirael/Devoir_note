@@ -5,6 +5,9 @@ import com.example.notev2.service.GradeService;
 import com.example.notev2.repository.ParametreRepository;
 import com.example.notev2.repository.OperateurRepository;
 import com.example.notev2.repository.CorrecteurRepository;
+import com.example.notev2.repository.CandidatRepository;
+import com.example.notev2.repository.NoteRepository;
+import com.example.notev2.repository.MatiereRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,20 +31,49 @@ public class GradeController {
     @Autowired
     private CorrecteurRepository correcteurRepository;
 
+    @Autowired
+    private CandidatRepository candidatRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
+
+    @Autowired
+    private MatiereRepository matiereRepository;
+
     @GetMapping("/")
     public String index(Model model) {
-        List<Candidat> candidats = gradeService.getAllCandidats();
-        List<Matiere> matieres = gradeService.getAllMatieres();
-        
-        Map<Long, Map<Matiere, BigDecimal>> gradeMap = new HashMap<>();
-        for (Candidat c : candidats) {
-            gradeMap.put(c.getId(), gradeService.getCalculatedGradesForCandidat(c));
-        }
+        model.addAttribute("candidats", gradeService.getAllCandidats());
+        return "candidat_list";
+    }
 
-        model.addAttribute("candidats", candidats);
+    @PostMapping("/candidat/save")
+    public String saveCandidat(@ModelAttribute Candidat candidat) {
+        candidatRepository.save(candidat);
+        return "redirect:/";
+    }
+
+    @GetMapping("/candidat/delete/{id}")
+    public String deleteCandidat(@PathVariable Long id) {
+        candidatRepository.deleteById(id);
+        return "redirect:/";
+    }
+
+    @GetMapping("/candidat/{id}")
+    public String viewDetails(@PathVariable Long id, Model model) {
+        Candidat c = candidatRepository.findById(id).orElse(null);
+        if (c == null) return "redirect:/";
+
+        List<Matiere> matieres = gradeService.getAllMatieres();
+        Map<Matiere, BigDecimal> calculatedGrades = gradeService.getCalculatedGradesForCandidat(c);
+        
+        // Find raw notes for this candidate to show in details
+        List<Note> rawNotes = noteRepository.findByCandidat(c);
+
+        model.addAttribute("candidat", c);
         model.addAttribute("matieres", matieres);
-        model.addAttribute("gradeMap", gradeMap);
-        return "grades_list";
+        model.addAttribute("calculatedGrades", calculatedGrades);
+        model.addAttribute("rawNotes", rawNotes);
+        return "candidat_details";
     }
 
     // --- Admin CRUD for Operateurs ---
@@ -88,5 +120,28 @@ public class GradeController {
     public String deleteParametre(@PathVariable Long id) {
         parametreRepository.deleteById(id);
         return "redirect:/admin/parametres";
+    }
+
+    @GetMapping("/simulate")
+    public String showSimulationForm(Model model) {
+        model.addAttribute("candidats", gradeService.getAllCandidats());
+        model.addAttribute("matieres", gradeService.getAllMatieres());
+        return "simulation";
+    }
+
+    @PostMapping("/simulate")
+    public String runSimulation(@RequestParam Long idCandidat, @RequestParam Long idMatiere, Model model) {
+        Candidat c = candidatRepository.findById(idCandidat).orElse(null);
+        Matiere m = matiereRepository.findById(idMatiere).orElse(null);
+        
+        if (c != null && m != null) {
+            model.addAttribute("result", gradeService.simulateGrade(c, m));
+        }
+        
+        model.addAttribute("candidats", gradeService.getAllCandidats());
+        model.addAttribute("matieres", gradeService.getAllMatieres());
+        model.addAttribute("selectedCandId", idCandidat);
+        model.addAttribute("selectedMatId", idMatiere);
+        return "simulation";
     }
 }

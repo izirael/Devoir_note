@@ -45,4 +45,8 @@ public class GradeService {
     public void saveNote(Note note) {
         noteRepository.save(note);
     }
+
+    public com.example.notev2.dto.SimulationResult simulateGrade(Candidat c, Matiere m) {
+        return calculationService.simulateGrade(c, m);
+    }
 }

@@ -23,47 +23,87 @@ public class CalculationService {
         if (notes.isEmpty()) return BigDecimal.ZERO;
         if (notes.size() == 1) return notes.get(0).getValeurNote();
 
-        // Sort notes by value to calculate gaps accurately if needed, 
-        // but requirement says "écart entre les notes des correcteurs".
-        // Let's assume we take the gap between the first two corrections for the rule.
-        BigDecimal n1 = notes.get(0).getValeurNote();
-        BigDecimal n2 = notes.get(1).getValeurNote();
-        BigDecimal gap = n1.subtract(n2).abs();
+        BigDecimal totalGap = calculateTotalGap(notes);
 
         List<Parametre> ranges = parametreRepository.findAll();
         Parametre matchedParam = null;
         for (Parametre p : ranges) {
-            if (gap.intValue() >= p.getMin() && gap.intValue() <= p.getMax()) {
+            if (totalGap.intValue() >= p.getMin() && totalGap.intValue() <= p.getMax()) {
                 matchedParam = p;
                 break;
             }
         }
 
         if (matchedParam == null) {
-            // Default: average of all notes if no range matches
+            return calculateAggregate(notes, "AVG");
+        }
+
+        return calculateAggregate(notes, matchedParam.getOperateur().getSymbole());
+    }
+
+    public com.example.notev2.dto.SimulationResult simulateGrade(Candidat candidat, Matiere matiere) {
+        com.example.notev2.dto.SimulationResult result = new com.example.notev2.dto.SimulationResult();
+        result.setCandidat(candidat);
+        result.setMatiere(matiere);
+        
+        List<Note> notes = noteRepository.findByCandidatAndMatiere(candidat, matiere);
+        result.setNotes(notes);
+        
+        if (notes.isEmpty()) {
+            result.setFinalGrade(BigDecimal.ZERO);
+            return result;
+        }
+        if (notes.size() == 1) {
+            result.setFinalGrade(notes.get(0).getValeurNote());
+            return result;
+        }
+
+        BigDecimal totalGap = calculateTotalGap(notes);
+        result.setGap(totalGap);
+
+        List<Parametre> ranges = parametreRepository.findAll();
+        Parametre matchedParam = null;
+        for (Parametre p : ranges) {
+            if (totalGap.intValue() >= p.getMin() && totalGap.intValue() <= p.getMax()) {
+                matchedParam = p;
+                break;
+            }
+        }
+        result.setMatchedParam(matchedParam);
+
+        if (matchedParam == null) {
+            result.setUsedDefault(true);
+            result.setFinalGrade(calculateAggregate(notes, "AVG"));
+        } else {
+            result.setFinalGrade(calculateAggregate(notes, matchedParam.getOperateur().getSymbole()));
+        }
+
+        return result;
+    }
+
+    private BigDecimal calculateTotalGap(List<Note> notes) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (int i = 0; i < notes.size(); i++) {
+            for (int j = i + 1; j < notes.size(); j++) {
+                total = total.add(notes.get(i).getValeurNote().subtract(notes.get(j).getValeurNote()).abs());
+            }
+        }
+        return total;
+    }
+
+    private BigDecimal calculateAggregate(List<Note> notes, String operator) {
+        if (notes.isEmpty()) return BigDecimal.ZERO;
+        
+        String op = operator.toUpperCase();
+        if (op.equals("MIN")) {
+            return notes.stream().map(Note::getValeurNote).min(BigDecimal::compareTo).get();
+        } else if (op.equals("MAX")) {
+            return notes.stream().map(Note::getValeurNote).max(BigDecimal::compareTo).get();
+        } else {
+            // Default to AVG
             BigDecimal sum = BigDecimal.ZERO;
             for (Note n : notes) sum = sum.add(n.getValeurNote());
             return sum.divide(new BigDecimal(notes.size()), 2, RoundingMode.HALF_UP);
-        }
-
-        // Apply operator of the matched range to the first note (base note)
-        String sym = matchedParam.getOperateur().getSymbole();
-        // The rule says "appliquer l'opérateur associé pour obtenir le résultat final"
-        // Usually, this might mean (Note1 + Note2) / 2 or similar, 
-        // but here we follow the "apply operator to get result" literally.
-        // Let's assume Result = n1 [OP] n2.
-        return applyOperator(n1, n2, sym);
-    }
-
-    private BigDecimal applyOperator(BigDecimal v1, BigDecimal v2, String symbole) {
-        switch (symbole) {
-            case "+": return v1.add(v2);
-            case "-": return v1.subtract(v2);
-            case "*": return v1.multiply(v2);
-            case "/": 
-                if (v2.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
-                return v1.divide(v2, 2, RoundingMode.HALF_UP);
-            default: return v1.subtract(v2);
         }
     }
 }

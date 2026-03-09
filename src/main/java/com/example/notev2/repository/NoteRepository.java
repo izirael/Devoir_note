@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByCandidatAndMatiere(Candidat candidat, Matiere matiere);
+    
+    List<Note> findByCandidat(Candidat candidat);
 }

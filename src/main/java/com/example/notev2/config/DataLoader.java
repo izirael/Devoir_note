@@ -61,21 +61,27 @@ public class DataLoader {
                 noteRepository.saveAll(java.util.List.of(n1, n2, n3, n4));
 
                 // Operators and Parameters (Barèmes)
-                Operateur opAdd = new Operateur(); opAdd.setNom("Addition"); opAdd.setSymbole("+");
-                Operateur opSub = new Operateur(); opSub.setNom("Soustraction"); opSub.setSymbole("-");
-                operateurRepository.saveAll(java.util.List.of(opAdd, opSub));
+                Operateur opMin = new Operateur(); opMin.setNom("Note Minimale"); opMin.setSymbole("MIN");
+                Operateur opMax = new Operateur(); opMax.setNom("Note Maximale"); opMax.setSymbole("MAX");
+                Operateur opAvg = new Operateur(); opAvg.setNom("Moyenne"); opAvg.setSymbole("AVG");
+                operateurRepository.saveAll(java.util.List.of(opMin, opMax, opAvg));
 
                 Parametre p1 = new Parametre();
-                p1.setOperateur(opSub);
+                p1.setOperateur(opMin);
                 p1.setMin(0);
                 p1.setMax(2);
                 
                 Parametre p2 = new Parametre();
-                p2.setOperateur(opAdd);
+                p2.setOperateur(opAvg);
                 p2.setMin(3);
-                p2.setMax(10);
+                p2.setMax(5);
+
+                Parametre p3 = new Parametre();
+                p3.setOperateur(opMax);
+                p3.setMin(6);
+                p3.setMax(100);
                 
-                parametreRepository.saveAll(java.util.List.of(p1, p2));
+                parametreRepository.saveAll(java.util.List.of(p1, p2, p3));
             }
         };
     }
