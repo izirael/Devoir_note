@@ -50,3 +50,8 @@ CREATE TABLE resolution (
 
 -- Initial Data for Operators
 INSERT INTO operateur (nom, symbole) VALUES ('Addition', '+'), ('Soustraction', '-'), ('Multiplication', '*'), ('Division', '/');
+
+INSERT INTO correcteur (nom) VALUES 
+('Louis'),
+('Nyaina'),
+('Mikolo');
