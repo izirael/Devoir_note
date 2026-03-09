@@ -1,11 +1,3 @@
--- Drop tables if they exist
-DROP TABLE IF EXISTS resolution;
-DROP TABLE IF EXISTS parametre;
-DROP TABLE IF EXISTS operateur;
-DROP TABLE IF EXISTS note;
-DROP TABLE IF EXISTS matiere;
-DROP TABLE IF EXISTS candidat;
-
 -- Core Entities
 CREATE TABLE candidat (
     id SERIAL PRIMARY KEY,
@@ -20,11 +12,16 @@ CREATE TABLE matiere (
     coefficient NUMERIC DEFAULT 1
 );
 
+CREATE TABLE correcteur (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE note (
     id SERIAL PRIMARY KEY,
     id_candidat INTEGER REFERENCES candidat(id),
     id_matiere INTEGER REFERENCES matiere(id_matiere),
-    id_correcteur INTEGER,
+    id_correcteur INTEGER REFERENCES correcteur(id),
     valeur_note NUMERIC NOT NULL
 );
 
@@ -38,8 +35,8 @@ CREATE TABLE operateur (
 CREATE TABLE parametre (
     id SERIAL PRIMARY KEY,
     id_operateur INTEGER REFERENCES operateur(id),
-    valeur_gauche VARCHAR(255), -- Could be a field name or a constant
-    valeur_droite VARCHAR(255)
+    min INT,
+    max INT
 );
 
 CREATE TABLE resolution (
@@ -48,10 +45,7 @@ CREATE TABLE resolution (
     resultat NUMERIC
 );
 
--- Initial Data for Operators
+-- Initial Data
 INSERT INTO operateur (nom, symbole) VALUES ('Addition', '+'), ('Soustraction', '-'), ('Multiplication', '*'), ('Division', '/');
 
-INSERT INTO correcteur (nom) VALUES 
-('Louis'),
-('Nyaina'),
-('Mikolo');
+INSERT INTO correcteur (nom) VALUES ('Louis'), ('Nyaina'), ('Mikolo');

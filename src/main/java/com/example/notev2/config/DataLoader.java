@@ -27,6 +27,9 @@ public class DataLoader {
     @Autowired
     private NoteRepository noteRepository;
 
+    @Autowired
+    private CorrecteurRepository correcteurRepository;
+
     @Bean
     public CommandLineRunner initData() {
         return args -> {
@@ -36,32 +39,43 @@ public class DataLoader {
                 Candidat c2 = new Candidat(); c2.setNom("Durand"); c2.setPrenom("Marie"); c2.setMatricule("MAT002");
                 candidatRepository.save(c1); candidatRepository.save(c2);
 
+                // Correcteurs
+                Correcteur cor1 = new Correcteur(); cor1.setNom("Louis");
+                Correcteur cor2 = new Correcteur(); cor2.setNom("Nyaina");
+                Correcteur cor3 = new Correcteur(); cor3.setNom("Mikolo");
+                correcteurRepository.saveAll(java.util.List.of(cor1, cor2, cor3));
+
                 // Matieres
                 Matiere m1 = new Matiere(); m1.setNom("Mathématiques"); m1.setCoefficient(new BigDecimal("2"));
-                Matiere m2 = new Matiere(); m2.setNom("Français"); m2.setCoefficient(new BigDecimal("1"));
+                Matiere m2 = new Matiere(); m2.setNom("Français"); m1.setCoefficient(new BigDecimal("1"));
                 matiereRepository.save(m1); matiereRepository.save(m2);
 
                 // Notes for Jean in Math (Multi-correction)
-                Note n1 = new Note(); n1.setCandidat(c1); n1.setMatiere(m1); n1.setIdCorrecteur(1); n1.setValeurNote(new BigDecimal("12"));
-                Note n2 = new Note(); n2.setCandidat(c1); n2.setMatiere(m1); n2.setIdCorrecteur(2); n2.setValeurNote(new BigDecimal("14"));
-                Note n3 = new Note(); n3.setCandidat(c1); n3.setMatiere(m1); n3.setIdCorrecteur(3); n3.setValeurNote(new BigDecimal("11"));
+                Note n1 = new Note(); n1.setCandidat(c1); n1.setMatiere(m1); n1.setCorrecteur(cor1); n1.setValeurNote(new BigDecimal("12"));
+                Note n2 = new Note(); n2.setCandidat(c1); n2.setMatiere(m1); n2.setCorrecteur(cor2); n2.setValeurNote(new BigDecimal("14"));
+                Note n3 = new Note(); n3.setCandidat(c1); n3.setMatiere(m1); n3.setCorrecteur(cor3); n3.setValeurNote(new BigDecimal("11"));
                 
                 // Notes for Marie in Math
-                Note n4 = new Note(); n4.setCandidat(c2); n4.setMatiere(m1); n4.setIdCorrecteur(1); n4.setValeurNote(new BigDecimal("9"));
+                Note n4 = new Note(); n4.setCandidat(c2); n4.setMatiere(m1); n4.setCorrecteur(cor1); n4.setValeurNote(new BigDecimal("9"));
                 
-                noteRepository.save(n1); noteRepository.save(n2); noteRepository.save(n3); noteRepository.save(n4);
+                noteRepository.saveAll(java.util.List.of(n1, n2, n3, n4));
 
-                // Operators (if not in schema.sql or as fallback)
-                if (operateurRepository.count() == 0) {
-                    Operateur opSub = new Operateur(); opSub.setNom("Soustraction"); opSub.setSymbole("-");
-                    operateurRepository.save(opSub);
-                    
-                    Parametre p = new Parametre();
-                    p.setOperateur(opSub);
-                    p.setValeurGauche("PREV_NOTE");
-                    p.setValeurDroite("NEXT_NOTE");
-                    parametreRepository.save(p);
-                }
+                // Operators and Parameters (Barèmes)
+                Operateur opAdd = new Operateur(); opAdd.setNom("Addition"); opAdd.setSymbole("+");
+                Operateur opSub = new Operateur(); opSub.setNom("Soustraction"); opSub.setSymbole("-");
+                operateurRepository.saveAll(java.util.List.of(opAdd, opSub));
+
+                Parametre p1 = new Parametre();
+                p1.setOperateur(opSub);
+                p1.setMin(0);
+                p1.setMax(2);
+                
+                Parametre p2 = new Parametre();
+                p2.setOperateur(opAdd);
+                p2.setMin(3);
+                p2.setMax(10);
+                
+                parametreRepository.saveAll(java.util.List.of(p1, p2));
             }
         };
     }

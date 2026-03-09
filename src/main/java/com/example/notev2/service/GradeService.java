@@ -37,7 +37,7 @@ public class GradeService {
         Map<Matiere, BigDecimal> results = new HashMap<>();
         List<Matiere> matieres = matiereRepository.findAll();
         for (Matiere m : matieres) {
-            results.put(m, calculationService.calculateTotalDifference(candidat, m));
+            results.put(m, calculationService.calculateDynamicGrade(candidat, m));
         }
         return results;
     }

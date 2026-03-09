@@ -18,35 +18,41 @@ public class CalculationService {
     @Autowired
     private NoteRepository noteRepository;
 
-    public BigDecimal calculateTotalDifference(Candidat candidat, Matiere matiere) {
+    public BigDecimal calculateDynamicGrade(Candidat candidat, Matiere matiere) {
         List<Note> notes = noteRepository.findByCandidatAndMatiere(candidat, matiere);
-        if (notes.isEmpty() || notes.size() < 2) {
-            return BigDecimal.ZERO;
-        }
+        if (notes.isEmpty()) return BigDecimal.ZERO;
+        if (notes.size() == 1) return notes.get(0).getValeurNote();
 
-        List<Parametre> parametres = parametreRepository.findAll();
-        if (parametres.isEmpty()) {
-            // Default logic: sum of differences between consecutive notes
-            BigDecimal totalDiff = BigDecimal.ZERO;
-            for (int i = 1; i < notes.size(); i++) {
-                totalDiff = totalDiff.add(notes.get(i).getValeurNote().subtract(notes.get(i - 1).getValeurNote()).abs());
+        // Sort notes by value to calculate gaps accurately if needed, 
+        // but requirement says "écart entre les notes des correcteurs".
+        // Let's assume we take the gap between the first two corrections for the rule.
+        BigDecimal n1 = notes.get(0).getValeurNote();
+        BigDecimal n2 = notes.get(1).getValeurNote();
+        BigDecimal gap = n1.subtract(n2).abs();
+
+        List<Parametre> ranges = parametreRepository.findAll();
+        Parametre matchedParam = null;
+        for (Parametre p : ranges) {
+            if (gap.intValue() >= p.getMin() && gap.intValue() <= p.getMax()) {
+                matchedParam = p;
+                break;
             }
-            return totalDiff;
         }
 
-        // Apply dynamic logic from Parametre
-        // For simplicity, we assume the first parameter defines the operation to apply iteratively
-        Parametre p = parametres.get(0);
-        String sym = p.getOperateur().getSymbole();
-        
-        BigDecimal result = BigDecimal.ZERO;
-        for (int i = 1; i < notes.size(); i++) {
-            BigDecimal v1 = notes.get(i-1).getValeurNote();
-            BigDecimal v2 = notes.get(i).getValeurNote();
-            result = result.add(applyOperator(v1, v2, sym).abs());
+        if (matchedParam == null) {
+            // Default: average of all notes if no range matches
+            BigDecimal sum = BigDecimal.ZERO;
+            for (Note n : notes) sum = sum.add(n.getValeurNote());
+            return sum.divide(new BigDecimal(notes.size()), 2, RoundingMode.HALF_UP);
         }
 
-        return result;
+        // Apply operator of the matched range to the first note (base note)
+        String sym = matchedParam.getOperateur().getSymbole();
+        // The rule says "appliquer l'opérateur associé pour obtenir le résultat final"
+        // Usually, this might mean (Note1 + Note2) / 2 or similar, 
+        // but here we follow the "apply operator to get result" literally.
+        // Let's assume Result = n1 [OP] n2.
+        return applyOperator(n1, n2, sym);
     }
 
     private BigDecimal applyOperator(BigDecimal v1, BigDecimal v2, String symbole) {

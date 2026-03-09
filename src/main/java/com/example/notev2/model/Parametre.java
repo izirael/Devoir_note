@@ -15,6 +15,6 @@ public class Parametre {
     @JoinColumn(name = "id_operateur")
     private Operateur operateur;
 
-    private String valeurGauche;
-    private String valeurDroite;
+    private Integer min;
+    private Integer max;
 }

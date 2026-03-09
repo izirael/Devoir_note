@@ -14,7 +14,8 @@
         <header>
             <h1>Student Grades</h1>
             <nav>
-                <a href="/config" class="nav-link">Configuration</a>
+                <a href="/admin/parametres" class="nav-link">Barèmes</a>
+                <a href="/admin/operateurs" class="nav-link">Opérateurs</a>
             </nav>
         </header>
 

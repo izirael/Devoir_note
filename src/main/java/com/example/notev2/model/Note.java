@@ -20,7 +20,9 @@ public class Note {
     @JoinColumn(name = "id_matiere")
     private Matiere matiere;
 
-    private Integer idCorrecteur;
+    @ManyToOne
+    @JoinColumn(name = "id_correcteur")
+    private Correcteur correcteur;
 
     @Column(name = "valeur_note")
     private BigDecimal valeurNote;
