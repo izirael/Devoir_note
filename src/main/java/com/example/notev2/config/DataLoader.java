@@ -38,13 +38,13 @@ public class DataLoader {
 
                 // Matieres
                 Matiere m1 = new Matiere(); m1.setNom("Mathématiques"); m1.setCoefficient(new BigDecimal("2"));
-                Matiere m2 = new Matiere(); m2.setNom("Français"); m1.setCoefficient(new BigDecimal("1"));
+                Matiere m2 = new Matiere(); m2.setNom("Français"); m2.setCoefficient(new BigDecimal("1"));
                 matiereRepository.save(m1); matiereRepository.save(m2);
 
                 // Notes for Jean in Math (Multi-correction)
                 Note n1 = new Note(); n1.setCandidat(c1); n1.setMatiere(m1); n1.setIdCorrecteur(1); n1.setValeurNote(new BigDecimal("12"));
-                Note n2 = new Note(); n2.setCandidat(c1); n1.setMatiere(m1); n2.setIdCorrecteur(2); n2.setValeurNote(new BigDecimal("14"));
-                Note n3 = new Note(); n3.setCandidat(c1); n1.setMatiere(m1); n3.setIdCorrecteur(3); n3.setValeurNote(new BigDecimal("11"));
+                Note n2 = new Note(); n2.setCandidat(c1); n2.setMatiere(m1); n2.setIdCorrecteur(2); n2.setValeurNote(new BigDecimal("14"));
+                Note n3 = new Note(); n3.setCandidat(c1); n3.setMatiere(m1); n3.setIdCorrecteur(3); n3.setValeurNote(new BigDecimal("11"));
                 
                 // Notes for Marie in Math
                 Note n4 = new Note(); n4.setCandidat(c2); n4.setMatiere(m1); n4.setIdCorrecteur(1); n4.setValeurNote(new BigDecimal("9"));

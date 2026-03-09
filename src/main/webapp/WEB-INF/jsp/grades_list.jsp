@@ -38,9 +38,16 @@
                             <c:forEach items="${matieres}" var="matiere">
                                 <c:set var="grade" value="${gradeMap[candidat.id][matiere]}" />
                                 <td>
-                                    <span class="grade ${grade < 10 ? 'grade-red' : (grade <= 12 ? 'grade-yellow' : 'grade-green')}">
-                                        <fmt:formatNumber value="${grade}" maxFractionDigits="2" />
-                                    </span>
+                                    <c:choose>
+                                        <c:when test="${not empty grade}">
+                                            <span class="grade ${grade < 10 ? 'grade-red' : (grade <= 12 ? 'grade-yellow' : 'grade-green')}">
+                                                <fmt:formatNumber value="${grade}" maxFractionDigits="2" />
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="grade" style="color: var(--text-secondary)">-</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </c:forEach>
                         </tr>
