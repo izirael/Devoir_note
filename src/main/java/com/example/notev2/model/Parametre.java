@@ -15,6 +15,13 @@ public class Parametre {
     @JoinColumn(name = "id_operateur")
     private Operateur operateur;
 
-    private Integer min;
-    private Integer max;
+    @ManyToOne
+    @JoinColumn(name = "id_matiere")
+    private Matiere matiere;
+
+    @ManyToOne
+    @JoinColumn(name = "id_resolution")
+    private Resolution resolution;
+
+    private Integer gap;
 }

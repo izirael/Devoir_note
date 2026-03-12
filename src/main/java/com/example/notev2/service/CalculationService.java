@@ -25,20 +25,25 @@ public class CalculationService {
 
         BigDecimal totalGap = calculateTotalGap(notes);
 
-        List<Parametre> ranges = parametreRepository.findAll();
+        // Find parameters for this subject, sorted by gap threshold asc
+        List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
+        
         Parametre matchedParam = null;
-        for (Parametre p : ranges) {
-            if (totalGap.intValue() >= p.getMin() && totalGap.intValue() <= p.getMax()) {
+        for (Parametre p : params) {
+            // Requirement says: compare total to 'gap' in parameter table to select resolution
+            // We assume "select where totalGap is within threshold"
+            if (totalGap.intValue() <= p.getGap()) {
                 matchedParam = p;
                 break;
             }
         }
 
         if (matchedParam == null) {
+            // Default to Average if no threshold is met (fallback)
             return calculateAggregate(notes, "AVG");
         }
 
-        return calculateAggregate(notes, matchedParam.getOperateur().getSymbole());
+        return calculateAggregate(notes, matchedParam.getResolution().getNom());
     }
 
     public com.example.notev2.dto.SimulationResult simulateGrade(Candidat candidat, Matiere matiere) {
@@ -61,10 +66,10 @@ public class CalculationService {
         BigDecimal totalGap = calculateTotalGap(notes);
         result.setGap(totalGap);
 
-        List<Parametre> ranges = parametreRepository.findAll();
+        List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
         Parametre matchedParam = null;
-        for (Parametre p : ranges) {
-            if (totalGap.intValue() >= p.getMin() && totalGap.intValue() <= p.getMax()) {
+        for (Parametre p : params) {
+            if (totalGap.intValue() <= p.getGap()) {
                 matchedParam = p;
                 break;
             }
@@ -75,7 +80,7 @@ public class CalculationService {
             result.setUsedDefault(true);
             result.setFinalGrade(calculateAggregate(notes, "AVG"));
         } else {
-            result.setFinalGrade(calculateAggregate(notes, matchedParam.getOperateur().getSymbole()));
+            result.setFinalGrade(calculateAggregate(notes, matchedParam.getResolution().getNom()));
         }
 
         return result;

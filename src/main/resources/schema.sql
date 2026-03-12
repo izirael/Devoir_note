@@ -29,20 +29,20 @@ CREATE TABLE note (
 CREATE TABLE operateur (
     id SERIAL PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
-    symbole VARCHAR(10) NOT NULL -- ex: +, -, *, /
+    symbole VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE resolution (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE parametre (
     id SERIAL PRIMARY KEY,
     id_operateur INTEGER REFERENCES operateur(id),
-    min INT,
-    max INT
-);
-
-CREATE TABLE resolution (
-    id SERIAL PRIMARY KEY,
-    description TEXT,
-    resultat NUMERIC
+    id_matiere INTEGER REFERENCES matiere(id_matiere),
+    id_resolution INTEGER REFERENCES resolution(id),
+    gap INTEGER NOT NULL
 );
 
 -- Initial Data

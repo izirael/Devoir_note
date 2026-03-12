@@ -4,65 +4,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Candidate Management</title>
+    <title>GradeV2 - Dashboard</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <jsp:include page="common/navbar.jsp" />
+
     <div class="container">
-        <header>
-            <h1>Gestion des Candidats</h1>
-            <nav>
-                <a href="/admin/parametres" class="nav-link">Barèmes</a>
-                <a href="/admin/operateurs" class="nav-link">Opérateurs</a>
-                <a href="/simulate" class="nav-link" style="color: var(--accent)">Simuler</a>
-            </nav>
-        </header>
-
-        <div class="glass-card" style="margin-bottom: 2rem;">
-            <h2>Liste des Candidats</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Matricule</th>
-                        <th>Nom</th>
-                        <th>Prénom</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${candidats}" var="c">
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Liste des Candidats</h2>
+                <a href="/admin/candidats" class="btn btn-outline" style="color: var(--accent);">Gerer les Candidats</a>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td>${c.matricule}</td>
-                            <td>${c.nom}</td>
-                            <td>${c.prenom}</td>
-                            <td>
-                                <a href="/candidat/${c.id}" class="nav-link">Voir Notes</a> |
-                                <a href="/candidat/delete/${c.id}" class="nav-link" style="color: var(--danger)" onclick="return confirm('Supprimer ce candidat ?')">Supprimer</a>
-                            </td>
+                            <th>Matricule</th>
+                            <th>Nom & Prenom</th>
+                            <th>Actions</th>
                         </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="glass-card" style="max-width: 500px;">
-            <h2>Ajouter / Modifier Candidat</h2>
-            <form action="/candidat/save" method="POST">
-                <input type="hidden" name="id" id="candId">
-                <div class="form-group">
-                    <label>Matricule</label>
-                    <input type="text" name="matricule" required>
-                </div>
-                <div class="form-group">
-                    <label>Nom</label>
-                    <input type="text" name="nom" required>
-                </div>
-                <div class="form-group">
-                    <label>Prénom</label>
-                    <input type="text" name="prenom" required>
-                </div>
-                <button type="submit">Enregistrer</button>
-            </form>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${candidats}" var="c">
+                            <tr>
+                                <td><span class="badge blue">${c.matricule}</span></td>
+                                <td style="font-weight: 600;">${c.nom} ${c.prenom}</td>
+                                <td>
+                                    <a href="/candidat/${c.id}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Voir Details & Notes</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
