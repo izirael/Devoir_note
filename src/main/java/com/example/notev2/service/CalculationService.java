@@ -31,14 +31,13 @@ public class CalculationService {
         List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
 
         Parametre matchedParam = null;
-        BigDecimal minDifference = null;
         for (Parametre p : params) {
-            BigDecimal paramGap = new BigDecimal(p.getGap());
-            BigDecimal difference = totalGap.subtract(paramGap).abs();
-
-            if (minDifference == null || difference.compareTo(minDifference) < 0) {
-                minDifference = difference;
+            // Requirement says: compare total to 'gap' in parameter table to select
+            // resolution
+            // We assume "select where totalGap is within threshold"
+            if (totalGap.intValue() <= p.getGap()) {
                 matchedParam = p;
+                break;
             }
         }
 
@@ -72,14 +71,10 @@ public class CalculationService {
 
         List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
         Parametre matchedParam = null;
-        BigDecimal minDifference = null;
         for (Parametre p : params) {
-            BigDecimal paramGap = new BigDecimal(p.getGap());
-            BigDecimal difference = totalGap.subtract(paramGap).abs();
-
-            if (minDifference == null || difference.compareTo(minDifference) < 0) {
-                minDifference = difference;
+            if (totalGap.intValue() <= p.getGap()) {
                 matchedParam = p;
+                break;
             }
         }
         result.setMatchedParam(matchedParam);

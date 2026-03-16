@@ -25,7 +25,7 @@
 
 body {
     background: var(--bg-deep);
-    background-image: 
+    background-image:
         radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0, transparent 50%),
         radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%),
         radial-gradient(at 50% 100%, rgba(34, 211, 238, 0.1) 0, transparent 50%);
@@ -91,7 +91,8 @@ body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover,
+.nav-item.active {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.05);
 }
@@ -114,16 +115,28 @@ body {
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     margin-bottom: 1.5rem;
     letter-spacing: -0.025em;
 }
 
-h2 { font-weight: 700; color: var(--text-primary); }
+h2 {
+    font-weight: 700;
+    color: var(--text-primary);
+}
 
 /* Table */
 .table-container {
@@ -154,20 +167,22 @@ td {
     border-bottom: 1px solid var(--glass-border);
 }
 
-td:first-child { 
-    border-left: 1px solid var(--glass-border); 
-    border-top-left-radius: 1rem; 
-    border-bottom-left-radius: 1rem; 
+td:first-child {
+    border-left: 1px solid var(--glass-border);
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
 }
 
-td:last-child { 
-    border-right: 1px solid var(--glass-border); 
-    border-top-right-radius: 1rem; 
-    border-bottom-right-radius: 1rem; 
+td:last-child {
+    border-right: 1px solid var(--glass-border);
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
 }
 
 /* Form Elements */
-.form-group { margin-bottom: 2rem; }
+.form-group {
+    margin-bottom: 2rem;
+}
 
 label {
     display: block;
@@ -177,7 +192,8 @@ label {
     margin-bottom: 0.75rem;
 }
 
-input, select {
+input,
+select {
     width: 100%;
     background: rgba(2, 6, 23, 0.8);
     border: 1px solid var(--glass-border);
@@ -188,7 +204,8 @@ input, select {
     transition: all 0.3s;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px var(--primary-glow);
     outline: none;
@@ -241,6 +258,51 @@ input:focus, select:focus {
     text-transform: uppercase;
 }
 
-.badge-blue { background: rgba(14, 165, 233, 0.15); color: var(--primary); }
-.badge-green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-.badge-red { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+.badge-blue {
+    background: rgba(14, 165, 233, 0.15);
+    color: var(--primary);
+}
+
+.badge-green {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+}
+
+.badge-red {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--danger);
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    min-width: 180px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    z-index: 1000;
+    top: 100%;
+    margin-top: 0.5rem;
+}
+
+.dropdown:hover .dropdown-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.dropdown-content .nav-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    width: 100%;
+}
