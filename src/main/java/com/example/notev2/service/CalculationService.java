@@ -20,21 +20,25 @@ public class CalculationService {
 
     public BigDecimal calculateDynamicGrade(Candidat candidat, Matiere matiere) {
         List<Note> notes = noteRepository.findByCandidatAndMatiere(candidat, matiere);
-        if (notes.isEmpty()) return BigDecimal.ZERO;
-        if (notes.size() == 1) return notes.get(0).getValeurNote();
+        if (notes.isEmpty())
+            return BigDecimal.ZERO;
+        if (notes.size() == 1)
+            return notes.get(0).getValeurNote();
 
         BigDecimal totalGap = calculateTotalGap(notes);
 
         // Find parameters for this subject, sorted by gap threshold asc
         List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
-        
+
         Parametre matchedParam = null;
+        BigDecimal minDifference = null;
         for (Parametre p : params) {
-            // Requirement says: compare total to 'gap' in parameter table to select resolution
-            // We assume "select where totalGap is within threshold"
-            if (totalGap.intValue() <= p.getGap()) {
+            BigDecimal paramGap = new BigDecimal(p.getGap());
+            BigDecimal difference = totalGap.subtract(paramGap).abs();
+
+            if (minDifference == null || difference.compareTo(minDifference) < 0) {
+                minDifference = difference;
                 matchedParam = p;
-                break;
             }
         }
 
@@ -50,10 +54,10 @@ public class CalculationService {
         com.example.notev2.dto.SimulationResult result = new com.example.notev2.dto.SimulationResult();
         result.setCandidat(candidat);
         result.setMatiere(matiere);
-        
+
         List<Note> notes = noteRepository.findByCandidatAndMatiere(candidat, matiere);
         result.setNotes(notes);
-        
+
         if (notes.isEmpty()) {
             result.setFinalGrade(BigDecimal.ZERO);
             return result;
@@ -68,10 +72,14 @@ public class CalculationService {
 
         List<Parametre> params = parametreRepository.findByMatiereOrderByGapAsc(matiere);
         Parametre matchedParam = null;
+        BigDecimal minDifference = null;
         for (Parametre p : params) {
-            if (totalGap.intValue() <= p.getGap()) {
+            BigDecimal paramGap = new BigDecimal(p.getGap());
+            BigDecimal difference = totalGap.subtract(paramGap).abs();
+
+            if (minDifference == null || difference.compareTo(minDifference) < 0) {
+                minDifference = difference;
                 matchedParam = p;
-                break;
             }
         }
         result.setMatchedParam(matchedParam);
@@ -97,8 +105,9 @@ public class CalculationService {
     }
 
     private BigDecimal calculateAggregate(List<Note> notes, String operator) {
-        if (notes.isEmpty()) return BigDecimal.ZERO;
-        
+        if (notes.isEmpty())
+            return BigDecimal.ZERO;
+
         String op = operator.toUpperCase();
         if (op.equals("MIN")) {
             return notes.stream().map(Note::getValeurNote).min(BigDecimal::compareTo).get();
@@ -107,7 +116,8 @@ public class CalculationService {
         } else {
             // Default to AVG
             BigDecimal sum = BigDecimal.ZERO;
-            for (Note n : notes) sum = sum.add(n.getValeurNote());
+            for (Note n : notes)
+                sum = sum.add(n.getValeurNote());
             return sum.divide(new BigDecimal(notes.size()), 2, RoundingMode.HALF_UP);
         }
     }
