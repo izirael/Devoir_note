@@ -81,11 +81,12 @@ public class GradeController {
     @GetMapping("/candidat/{id}")
     public String viewDetails(@PathVariable Long id, Model model) {
         Candidat c = candidatRepository.findById(id).orElse(null);
-        if (c == null) return "redirect:/";
+        if (c == null)
+            return "redirect:/";
 
         List<Matiere> matieres = gradeService.getAllMatieres();
         Map<Matiere, BigDecimal> calculatedGrades = gradeService.getCalculatedGradesForCandidat(c);
-        
+
         // Find raw notes for this candidate to show in details
         List<Note> rawNotes = noteRepository.findByCandidat(c);
 
@@ -148,6 +149,12 @@ public class GradeController {
         return "admin_params";
     }
 
+    @PostMapping("/admin/parametres/save")
+    public String saveParametre(@ModelAttribute Parametre parametre) {
+        parametreRepository.save(parametre);
+        return "redirect:/admin/parametres";
+    }
+
     // --- Admin CRUD for Notes (Raw Grades) ---
     @GetMapping("/admin/notes")
     public String listNotes(Model model) {
@@ -200,11 +207,11 @@ public class GradeController {
     public String runSimulation(@RequestParam Long idCandidat, @RequestParam Long idMatiere, Model model) {
         Candidat c = candidatRepository.findById(idCandidat).orElse(null);
         Matiere m = matiereRepository.findById(idMatiere).orElse(null);
-        
+
         if (c != null && m != null) {
             model.addAttribute("result", gradeService.simulateGrade(c, m));
         }
-        
+
         model.addAttribute("candidats", gradeService.getAllCandidats());
         model.addAttribute("matieres", gradeService.getAllMatieres());
         model.addAttribute("selectedCandId", idCandidat);
@@ -216,7 +223,7 @@ public class GradeController {
     public String listAllGrades(Model model) {
         List<Candidat> candidats = gradeService.getAllCandidats();
         List<Matiere> matieres = gradeService.getAllMatieres();
-        
+
         Map<Long, Map<Matiere, BigDecimal>> gradeMap = new HashMap<>();
         for (Candidat c : candidats) {
             gradeMap.put(c.getId(), gradeService.getCalculatedGradesForCandidat(c));
@@ -226,5 +233,92 @@ public class GradeController {
         model.addAttribute("matieres", matieres);
         model.addAttribute("gradeMap", gradeMap);
         return "grades_list";
+    }
+
+    // --- Admin CRUD for Correcteurs ---
+    @GetMapping("/admin/correcteurs")
+    public String listCorrecteurs(Model model) {
+        model.addAttribute("correcteurs", correcteurRepository.findAll());
+        return "admin_correcteurs";
+    }
+
+    @PostMapping("/admin/correcteurs/save")
+    public String saveCorrecteur(@ModelAttribute Correcteur correcteur) {
+        correcteurRepository.save(correcteur);
+        return "redirect:/admin/correcteurs";
+    }
+
+    @GetMapping("/admin/correcteurs/edit/{id}")
+    public String editCorrecteur(@PathVariable Long id, Model model) {
+        Correcteur c = correcteurRepository.findById(id).orElse(null);
+        if (c != null) {
+            model.addAttribute("editCorrecteur", c);
+        }
+        model.addAttribute("correcteurs", correcteurRepository.findAll());
+        return "admin_correcteurs";
+    }
+
+    @GetMapping("/admin/correcteurs/delete/{id}")
+    public String deleteCorrecteur(@PathVariable Long id) {
+        correcteurRepository.deleteById(id);
+        return "redirect:/admin/correcteurs";
+    }
+
+    // --- Admin CRUD for Matieres ---
+    @GetMapping("/admin/matieres")
+    public String listMatieres(Model model) {
+        model.addAttribute("matieres", matiereRepository.findAll());
+        return "admin_matieres";
+    }
+
+    @PostMapping("/admin/matieres/save")
+    public String saveMatiere(@ModelAttribute Matiere matiere) {
+        matiereRepository.save(matiere);
+        return "redirect:/admin/matieres";
+    }
+
+    @GetMapping("/admin/matieres/edit/{idMatiere}")
+    public String editMatiere(@PathVariable Long idMatiere, Model model) {
+        Matiere m = matiereRepository.findById(idMatiere).orElse(null);
+        if (m != null) {
+            model.addAttribute("editMatiere", m);
+        }
+        model.addAttribute("matieres", matiereRepository.findAll());
+        return "admin_matieres";
+    }
+
+    @GetMapping("/admin/matieres/delete/{idMatiere}")
+    public String deleteMatiere(@PathVariable Long idMatiere) {
+        matiereRepository.deleteById(idMatiere);
+        return "redirect:/admin/matieres";
+    }
+
+    // --- Admin CRUD for Resolutions ---
+    @GetMapping("/admin/resolutions")
+    public String listResolutions(Model model) {
+        model.addAttribute("resolutions", resolutionRepository.findAll());
+        return "admin_resolutions";
+    }
+
+    @PostMapping("/admin/resolutions/save")
+    public String saveResolution(@ModelAttribute Resolution resolution) {
+        resolutionRepository.save(resolution);
+        return "redirect:/admin/resolutions";
+    }
+
+    @GetMapping("/admin/resolutions/edit/{id}")
+    public String editResolution(@PathVariable Long id, Model model) {
+        Resolution r = resolutionRepository.findById(id).orElse(null);
+        if (r != null) {
+            model.addAttribute("editResolution", r);
+        }
+        model.addAttribute("resolutions", resolutionRepository.findAll());
+        return "admin_resolutions";
+    }
+
+    @GetMapping("/admin/resolutions/delete/{id}")
+    public String deleteResolution(@PathVariable Long id) {
+        resolutionRepository.deleteById(id);
+        return "redirect:/admin/resolutions";
     }
 }

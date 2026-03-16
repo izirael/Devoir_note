@@ -48,4 +48,11 @@ CREATE TABLE parametre (
 -- Initial Data
 INSERT INTO operateur (nom, symbole) VALUES ('Addition', '+'), ('Soustraction', '-'), ('Multiplication', '*'), ('Division', '/');
 
-INSERT INTO correcteur (nom) VALUES ('Louis'), ('Nyaina'), ('Mikolo');
+INSERT INTO correcteur (nom) VALUES ('CORRECTEUR 1'), ('CORRECTEUR 2'), ('CORRECTEUR 3');
+
+INSERT INTO matiere (nom, coefficient) VALUES ('PHP', 0), ('JAVA', 0);
+
+
+INSERT INTO note (id_candidat, id_correcteur, id_matiere, valeur_note) VALUES (1,1,3,10), (1,2,3,11), (1,3,3,11.75);
+
+INSERT INTO parametre (id_matiere, id_operateur, id_resolution, gap) VALUES (3, 3, 1, 2), (3, 4, 2, 5);
