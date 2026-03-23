@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #3498db;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #e9ecef;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --transition: all 0.2s ease;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.navbar-minimal {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin-bottom: 3rem;
+}
+
+.brand-text {
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 1.25rem;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    background-color: var(--card-bg);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem;
+    font-weight: 500;
+}
+
+.btn-minimal {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+.btn-primary-minimal {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary-minimal:hover {
+    background-color: #1a252f;
+    color: white;
+}
+
+.btn-outline-minimal {
+    border-color: var(--border-color);
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.btn-outline-minimal:hover {
+    background: var(--bg-color);
+    border-color: var(--primary-color);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    border-top: none;
+    padding: 1rem 1.5rem;
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+}
+
+.hero-minimal {
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.hero-minimal h1 {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.hero-minimal p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.nav-link-minimal {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 2rem;
+    transition: var(--transition);
+}
+
+.nav-link-minimal:hover {
+    color: var(--primary-color);
+}
