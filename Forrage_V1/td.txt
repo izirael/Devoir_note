@@ -1,0 +1,36 @@
+Manadio an’ilay status hoe rehefa mamorona devis dia ilay status 
+demande lasa hoe devis créé
+
+Le resaka status lty
+Cree
+Devis créé
+Étude créé
+Na proposé ze tinoah fa 3 le status
+
+Mi-créer client, mi-créer demande, dia rehefa mikasika devis amzay 
+Dia misy type roa
+Devis étude sy devis forage
+
+Dia misy status ho an’ny demande izay en fonction an’ny devis
+Zany hoe misy status activen’ny devis izay misy eo
+Ohatra hoe manao devis etude ho an’ilay demande ray 
+Dia ilay demande zany lasa satus "devis étude créé"
+"Devis forage créé" 
+Mbola tsisy payé
+Dia ny status stockena ohatrany historique
+id_demande, id_status, date
+
+misy reduciton ana 10% raha miotra ny 1 000 000 ny vola ny prix unitaire fa ts montant 
+sql
+affichena amn page ray le SQL valiny 
+
+add reduction of 10% if the price of the unit is higher than 1 000 000 , only the price of the devis not the total , i already create a 
+table named promotion in the database so we can parametre it whenever we want in the interface 
+
+CREATE TABLE promotion (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL, 
+    seuil INTEGER NOT NULL,
+    pourcentage DECIMAL(5, 2) NOT NULL,
+    actif BOOLEAN DEFAULT TRUE
+);

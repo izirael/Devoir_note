@@ -15,6 +15,9 @@
         <div class="d-flex">
             <a th:href="@{/clients}" class="nav-link-minimal">Clients</a>
             <a th:href="@{/demandes}" class="nav-link-minimal active text-primary">Demandes</a>
+            <a th:href="@{/statuts}" class="nav-link-minimal">Statuts</a>
+            <a th:href="@{/demande-status}" class="nav-link-minimal">Demande Status</a>
+            <a th:href="@{/devis}" class="nav-link-minimal">Devis</a>
         </div>
     </div>
 </nav>
@@ -34,6 +37,7 @@
                     <th>Client</th>
                     <th>Lieu</th>
                     <th>District</th>
+                    <th>Statut</th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>
@@ -43,7 +47,12 @@
                     <td class="fw-medium" th:text="${demande.client != null ? demande.client.nom : 'Non assigné'}"></td>
                     <td th:text="${demande.lieu}"></td>
                     <td th:text="${demande.district}"></td>
+                    <td>
+                        <span class="badge bg-secondary" th:text="${demande.status != null ? demande.status : 'Nouveau'}"></span>
+                    </td>
                     <td class="text-end">
+                        <a th:href="@{/devis/calculator(demandeId=${demande.id})}" class="btn-minimal btn-success-minimal btn-sm me-2">Nouveau Devis</a>
+                        <a th:href="@{/demandes/{id}/status(id=${demande.id})}" class="btn-minimal btn-primary-minimal btn-sm me-2">Historique</a>
                         <a th:href="@{/demandes/edit/{id}(id=${demande.id})}" class="btn-minimal btn-outline-minimal btn-sm me-2">Modifier</a>
                         <a th:href="@{/demandes/delete/{id}(id=${demande.id})}" class="text-danger small text-decoration-none"
                            onclick="return confirm('Supprimer cette demande ?')">Supprimer</a>

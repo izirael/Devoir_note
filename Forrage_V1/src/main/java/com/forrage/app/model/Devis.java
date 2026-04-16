@@ -22,4 +22,10 @@ public class Devis {
     @ManyToOne
     @JoinColumn(name = "statut_id")
     private StatutDevis statut;
+
+    @ManyToOne
+    @JoinColumn(name = "type_devis_id")
+    private TypeDevis typeDevis;
+
+    private String libelle;
 }

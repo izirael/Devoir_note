@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Devis - Forrage</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar-minimal">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a th:href="@{/}" class="brand-text">FORRAGE</a>
+        <div class="d-flex">
+            <a th:href="@{/clients}" class="nav-link-minimal">Clients</a>
+            <a th:href="@{/demandes}" class="nav-link-minimal">Demandes</a>
+            <a th:href="@{/statuts}" class="nav-link-minimal">Statuts</a>
+            <a th:href="@{/demande-status}" class="nav-link-minimal">Demande Status</a>
+            <a th:href="@{/devis}" class="nav-link-minimal">Devis</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card p-4">
+                <h2 class="mb-4">Calculateur de Devis</h2>
+                
+                <div class="row g-3 mb-4 p-4 border rounded-3 bg-white shadow-sm">
+                    <div class="col-md-6">
+                        <label for="globalDemande" class="form-label small text-muted text-uppercase fw-semibold">Choisir une Demande</label>
+                        <select class="form-select border-primary-subtle" id="globalDemande" onchange="updateDemandeInfo()">
+                            <option value="">-- Sélectionner une demande --</option>
+                            <option th:each="d : ${demandes}" 
+                                    th:value="${d.id}" 
+                                    th:text="${d.client.nom + ' - ' + d.lieu}"
+                                    th:selected="${demande != null and d.id == demande.id}"
+                                    th:data-client="${d.client.nom}"
+                                    th:data-lieu="${d.lieu}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="globalTypeDevis" class="form-label small text-muted text-uppercase fw-semibold">Type de Devis (Global)</label>
+                        <select class="form-select border-primary-subtle" id="globalTypeDevis">
+                            <option value="">-- Choisir le type --</option>
+                            <option th:each="t : ${types}" th:value="${t.nom}" th:text="${t.nom}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="demandeContextInfo" th:style="${demande != null ? 'display: block' : 'display: none'}" class="alert alert-info border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Demande active :</strong> 
+                            <span id="displayClientName" th:text="${demande != null ? demande.client.nom : ''}"></span> - 
+                            <span id="displayLieu" th:text="${demande != null ? demande.lieu : ''}"></span>
+                        </div>
+                        <div class="badge bg-primary">EN COURS</div>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-4 p-3 bg-light rounded-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="libelle" class="form-label small text-muted text-uppercase fw-semibold">Libellé de l'élément</label>
+                        <input type="text" class="form-control" id="libelle" placeholder="Ex: Forage 100m, Analyse sol...">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="quantite" class="form-label small text-muted text-uppercase fw-semibold">Quantité</label>
+                        <input type="number" class="form-control" id="quantite" value="1" step="0.01">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="prixUnitaire" class="form-label small text-muted text-uppercase fw-semibold">Prix Unit.</label>
+                        <input type="number" class="form-control" id="prixUnitaire" placeholder="0.00" step="0.01">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="montantLigne" class="form-label small text-muted text-uppercase fw-semibold">Montant</label>
+                        <input type="text" class="form-control bg-white-50 fw-bold text-primary" id="montantLigne" readonly value="0,00">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn-minimal btn-primary-minimal w-100 py-2" onclick="addItem()">Ajouter</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table" id="devisTable">
+                        <thead>
+                            <tr>
+                                <th class="small text-muted text-uppercase">Libellé</th>
+                                <th class="small text-muted text-uppercase text-end">Quantité</th>
+                                <th class="small text-muted text-uppercase text-end">Prix Unitaire</th>
+                                <th class="small text-muted text-uppercase text-end">Total</th>
+                                <th class="small text-muted text-uppercase text-center" style="width: 80px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devisBody">
+                            <!-- Items dynamically added -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <th colspan="3" class="fw-bold fs-5">TOTAL DEVIS</th>
+                                <th class="text-end fw-bold fs-5 text-primary" id="totalDisplay">0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(devisItems)}" id="emptyMessage" class="p-5 text-center text-muted">
+                    Aucun élément ajouté au devis.
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a th:href="@{/devis}" class="btn-minimal btn-outline-minimal">Annuler</a>
+                    <button type="button" class="btn-minimal btn-success-minimal" id="btnSaveDevis" onclick="saveRealDevis()" style="display: none;">
+                        Enregistrer le Devis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const promotion = /*[[${promotion}]]*/ null;
+    /*]]>*/
+    let devisItems = [];
+    
+    // Real-time calculation
+    function updateRealTimeTotal() {
+        const qte = parseFloat(document.getElementById('quantite').value) || 0;
+        const pu = parseFloat(document.getElementById('prixUnitaire').value) || 0;
+        const total = qte * pu;
+        document.getElementById('montantLigne').value = total.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " AR";
+    }
+
+    document.getElementById('quantite').addEventListener('input', updateRealTimeTotal);
+    document.getElementById('prixUnitaire').addEventListener('input', updateRealTimeTotal);
+
+    function updateDemandeInfo() {
+        const select = document.getElementById('globalDemande');
+        const info = document.getElementById('demandeContextInfo');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (select.value) {
+            document.getElementById('displayClientName').innerText = selectedOption.getAttribute('data-client');
+            document.getElementById('displayLieu').innerText = selectedOption.getAttribute('data-lieu');
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
+        renderTable();
+    }
+
+    function addItem() {
+        const libelle = document.getElementById('libelle').value;
+        const qte = parseFloat(document.getElementById('quantite').value);
+        const pu = parseFloat(document.getElementById('prixUnitaire').value);
+
+        if (!libelle.trim()) {
+            alert("Veuillez saisir un libellé.");
+            return;
+        }
+
+        if (isNaN(qte) || qte <= 0 || isNaN(pu) || pu < 0) {
+            alert("Veuillez saisir des valeurs valides.");
+            return;
+        }
+
+        const totalOriginal = qte * pu;
+        let discountApplied = false;
+        let prixUnitaireDevis = pu;
+
+        if (promotion && promotion.actif && pu > promotion.seuil) {
+            discountApplied = true;
+            prixUnitaireDevis = pu - ((pu * promotion.pourcentage) / 100);
+        }
+
+        const item = {
+            id: Date.now(),
+            libelle: libelle,
+            quantite: qte,
+            prixUnitaire: pu,
+            prixUnitaireDevis: prixUnitaireDevis,
+            total: totalOriginal,
+            discountApplied: discountApplied
+        };
+
+        devisItems.push(item);
+        renderTable();
+        
+        // Reset fields
+        document.getElementById('libelle').value = "";
+        document.getElementById('prixUnitaire').value = "";
+        document.getElementById('quantite').value = "1";
+        updateRealTimeTotal();
+    }
+
+    function removeItem(id) {
+        devisItems = devisItems.filter(item => item.id !== id);
+        renderTable();
+    }
+
+    function renderTable() {
+        const body = document.getElementById('devisBody');
+        const emptyMsg = document.getElementById('emptyMessage');
+        body.innerHTML = "";
+        let totalGeneral = 0;
+
+        if (devisItems.length > 0) {
+            if (emptyMsg) emptyMsg.style.display = "none";
+        } else {
+            if (emptyMsg) emptyMsg.style.display = "block";
+        }
+
+        devisItems.forEach(item => {
+            totalGeneral += item.total;
+            const row = `
+                <tr>
+                    <td class="fw-medium">${item.libelle}</td>
+                    <td class="text-end">${item.quantite.toLocaleString('fr-FR')}</td>
+                    <td class="text-end">
+                        ${item.discountApplied ? `<del class="text-muted small fw-normal">${item.prixUnitaire.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</del><br>` : ''}
+                        ${(item.prixUnitaireDevis ?? item.prixUnitaire).toLocaleString('fr-FR', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td class="text-end fw-semibold">
+                        ${item.total.toLocaleString('fr-FR', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeItem(${item.id})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            body.innerHTML += row;
+        });
+
+        document.getElementById('totalDisplay').innerText = totalGeneral.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        // Show/Hide save button if demande is present
+        const btnSave = document.getElementById('btnSaveDevis');
+        if (btnSave) {
+            btnSave.style.display = devisItems.length > 0 ? "block" : "none";
+        }
+    }
+
+    async function saveRealDevis() {
+        const demandeId = document.getElementById('globalDemande').value;
+        const typeDevis = document.getElementById('globalTypeDevis').value;
+        
+        if (!demandeId) {
+            alert("Veuillez sélectionner une demande.");
+            return;
+        }
+        
+        if (!typeDevis) {
+            alert("Veuillez sélectionner un type de devis global.");
+            return;
+        }
+
+        const total = devisItems.reduce((acc, item) => acc + item.total, 0);
+        
+        const data = {
+            demandeId: demandeId,
+            montantTotal: total,
+            libelle: "Devis " + typeDevis + " - " + document.getElementById('displayClientName').innerText,
+            items: devisItems.map(item => ({
+                typeName: typeDevis, // Use the global type for all detail lines
+                quantite: item.quantite,
+                prixUnitaire: item.prixUnitaireDevis ?? item.prixUnitaire,
+                total: item.total
+            }))
+        };
+
+        try {
+            const response = await fetch('/devis/save-with-details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("Devis enregistré avec succès !");
+                window.location.href = "/devis";
+            } else {
+                alert("Erreur lors de l'enregistrement.");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Une erreur est survenue.");
+        }
+    }
+</script>
+
+</body>
+</html>

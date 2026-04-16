@@ -19,4 +19,5 @@ public class Demande {
     
     private String lieu;
     private String district;
+    private String status;
 }

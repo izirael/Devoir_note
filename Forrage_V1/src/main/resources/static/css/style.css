@@ -67,6 +67,26 @@ body {
     color: white;
 }
 
+.btn-success-minimal {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-success-minimal:hover {
+    background-color: #219150;
+    color: white;
+}
+
+.btn-warning-minimal {
+    background-color: #f39c12;
+    color: white;
+}
+
+.btn-warning-minimal:hover {
+    background-color: #e67e22;
+    color: white;
+}
+
 .btn-outline-minimal {
     border-color: var(--border-color);
     color: var(--primary-color);

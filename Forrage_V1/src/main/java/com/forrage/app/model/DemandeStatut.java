@@ -18,6 +18,11 @@ public class DemandeStatut {
     @ManyToOne
     @JoinColumn(name = "statut_id")
     private StatutDevis statut;
+
+    @ManyToOne
+    @JoinColumn(name = "demande_id")
+    private Demande demande;
     
     private LocalDate date;
+    private String observation;
 }

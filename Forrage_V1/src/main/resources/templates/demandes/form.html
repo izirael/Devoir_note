@@ -15,6 +15,7 @@
         <div class="d-flex">
             <a th:href="@{/clients}" class="nav-link-minimal">Clients</a>
             <a th:href="@{/demandes}" class="nav-link-minimal">Demandes</a>
+            <a th:href="@{/devis}" class="nav-link-minimal">Devis</a>
         </div>
     </div>
 </nav>
@@ -58,9 +59,106 @@
                     </div>
                 </form>
             </div>
+            
+            <!-- Détail Devis Section -->
+            <div class="card p-4 mt-4">
+                <h3 class="mb-4">Détail Devis (Calcul Local)</h3>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label for="typeDevis" class="form-label small text-muted text-uppercase fw-semibold">Type Devis</label>
+                        <select class="form-select" id="typeDevis">
+                            <option value="Etude">Etude</option>
+                            <option value="Forage">Forage</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="montantDevis" class="form-label small text-muted text-uppercase fw-semibold">Montant</label>
+                        <input type="number" class="form-control" id="montantDevis" placeholder="0.00">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary w-100" onclick="addItem()">Ajouter</button>
+                    </div>
+                </div>
+                
+                <table class="table table-sm mt-3" id="devisTable">
+                    <thead>
+                        <tr>
+                            <th class="small text-muted text-uppercase">Type</th>
+                            <th class="small text-muted text-uppercase text-end">Montant</th>
+                            <th class="small text-muted text-uppercase text-center" style="width: 80px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devisBody">
+                        <!-- Items will be added here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-light">
+                            <th class="fw-bold">TOTAL</th>
+                            <th class="text-end fw-bold" id="totalDisplay">0.00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    let devisItems = [];
+
+    function addItem() {
+        const type = document.getElementById('typeDevis').value;
+        const montant = parseFloat(document.getElementById('montantDevis').value);
+
+        if (isNaN(montant) || montant <= 0) {
+            alert("Veuillez saisir un montant valide.");
+            return;
+        }
+
+        const item = {
+            id: Date.now(),
+            type: type,
+            montant: montant
+        };
+
+        devisItems.push(item);
+        renderTable();
+        
+        // Reset amount field
+        document.getElementById('montantDevis').value = "";
+    }
+
+    function removeItem(id) {
+        devisItems = devisItems.filter(item => item.id !== id);
+        renderTable();
+    }
+
+    function renderTable() {
+        const body = document.getElementById('devisBody');
+        body.innerHTML = "";
+        let total = 0;
+
+        devisItems.forEach(item => {
+            total += item.montant;
+            const row = `
+                <tr>
+                    <td>${item.type}</td>
+                    <td class="text-end">${item.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(${item.id})">
+                            &times;
+                        </button>
+                    </td>
+                </tr>
+            `;
+            body.innerHTML += row;
+        });
+
+        document.getElementById('totalDisplay').innerText = total.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+</script>
 
 </body>
 </html>
